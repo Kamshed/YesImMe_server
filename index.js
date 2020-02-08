@@ -1,18 +1,35 @@
 const vision = require('@google-cloud/vision');
 const client = new vision.ImageAnnotatorClient();
+const firebase = require('firebase')
 
-/* const request = {
-  image: {
-    source: {imageUri: 'gs://cloud-samples-data/vision/using_curl/shanghai.jpeg'}
+
+/* 
+  NOTE: if auth fails, may need to edit 
+  rules for unauthenticated uploads 
+  or auth the req 
+*/
+
+
+exports.myFunction = (req, res) => { // extract text from gov-issued id
+
+  const request = {
+    image: {
+      source: { imageUri: req.body.proofOfId } // POST body > { "proofOfId": "/path/img" }
+    }
   }
-}; */
 
-exports.myFunction = (req, res) => {
   client
-    .textDetection('https://assets.fireside.fm/file/fireside-images/podcasts/images/b/bc7f1faf-8aad-4135-bb12-83a8af679756/cover_small.jpg')
+    .textDetection(request)
     .then(response => {
-      
-      res.status(200).send(response)
+      const file = {
+        img: request.image.source.imageUri,
+        name: req.body.userId // hash from user info
+      }
+      const storageRef = firebase.storage().ref(`users-proofOfId/${file.name}`) // Create storage ref
+      const task = storageRef.put(file) // store in firebase
+      const url = task.snapshot.ref.getDownloadURL() // get id url for face API
+
+      res.status(200).send(response, url) // return id text and url for azure faceAPI detection
     })
     .catch(err => {
       console.error(err);
