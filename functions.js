@@ -1,4 +1,4 @@
-const textDetection = require('./textDetection')
+const { textDetection } = require('./textDetect')
 
 
 /* 
@@ -11,6 +11,9 @@ const textDetection = require('./textDetection')
 exports.myFunction = (req, res) => {
 
     textDetection(req, res)  // extract text from gov-issued id
+    .then((response, url) => {
+      console.log(url)
+    })
     // next send info to a verification service
     // next face detect and verify
 

@@ -3,7 +3,7 @@ const client = new vision.ImageAnnotatorClient();
 const firebase = require('firebase')
 
 exports.textDetection = (req, res) => { // extract text from gov-issued id
-
+  console.log('in here')
     const request = {
       image: {
         source: { imageUri: req.body.proofOfId } // POST body > { "proofOfId": "/path/img" }
