@@ -1,18 +1,7 @@
-#import asyncio
-#import io
-#import glob
-#import os
-#import sys
-#import time
-#import uuid
-#import requests
-#from urllib.parse import urlparse
-#from io import BytesIO
-#from PIL import Image, ImageDraw
 from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
-#from azure.cognitiveservices.vision.face.models import TrainingStatusType, Person, SnapshotObjectType, OperationStatusType
 from azureConfig import ENDPOINT, KEY
+from app import idImage, userImage
 
 
 
@@ -33,10 +22,11 @@ IMAGE_BASE_URL = 'https://csdx.blob.core.windows.net/resources/Face/Images/'
 
 # --------------Sources--------------
 
-target_image_file_names = ['Family1-Dad1.jpg', 'Family1-Dad2.jpg']
+target_image_file_names = ['idImage_{idImage}', 'userImage_{userImage}']
+
 # The source photos contain this person
-source_image_file_name1 = 'Family1-Dad3.jpg'
-source_image_file_name2 = 'Family1-Son1.jpg'
+source_image_file_name1 = idImage # pull info from app.js
+source_image_file_name2 = userImage # pull info from app.js
 
 
 
