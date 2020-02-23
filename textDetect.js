@@ -2,7 +2,26 @@ const vision = require('@google-cloud/vision');
 const client = new vision.ImageAnnotatorClient();
 const firebase = require('firebase')
 
-exports.textDetection = (req, res) => { // extract text from gov-issued id
+const textDetect = proofOfId => {
+  const request = {
+    image: {
+      source: { imageUri: proofOfId } // POST body > { "proofOfId": "/path/img" }
+    }
+  }
+  
+
+  client
+    .textDetection(request)
+    .then(response => {
+      console.log('running:', response)
+      return response
+    })
+    .catch(err => {
+      return err
+    })
+}
+
+/* exports.textDetection = (req, res) => { // extract text from gov-issued id
   console.log('in here')
     const request = {
       image: {
@@ -27,4 +46,8 @@ exports.textDetection = (req, res) => { // extract text from gov-issued id
         console.error(err);
       })
     
+  } */
+
+  module.exports = {
+    textDetect
   }

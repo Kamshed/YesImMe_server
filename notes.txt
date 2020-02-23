@@ -1,0 +1,21 @@
+## IMPORTANT
+    -   OCR is not currently working for buffer streaming.
+        currently requires url.
+        We don't want to save image anywhere. If possible
+        it would be best to send info as binary stream or 
+        string and not save info anywhere.
+
+
+
+-   Need to run textDetection async with faceVerification
+
+-   Currently '/upload' http request with info will run faceVerification.
+    This is where it will run the textDetection async (Promise.all)
+
+-   Then run next() to trigger callback on express http request.
+    At this time we'll respond with faceVerification status: 
+    'Verified/Not Verified' as well as user verication status:
+    'Pending'. Then, send text from id to be verified via some 
+    service using (likely) another http request.
+
+-   Inside the original function we need to verify no image doctoring 

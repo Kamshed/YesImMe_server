@@ -1,5 +1,9 @@
 const express = require('express')
 const app = express()
+const { faceDetect, faceVerify } = require('./faceApi')
+const { textDetect } = require('./textDetect')
+
+
 
 /* ------------for firebase Auth-------------- */
 const admin = require("firebase-admin");
@@ -14,15 +18,18 @@ admin.initializeApp({
 
 
 
-
 /* ------------for request-------------- */
 const { multer } = require('./middleware')
 
 
 
 
+let userInfo; // object that holds important response data
+
+
+
 /* ------------request start-------------- */
-app.post('/upload', multer.any(), (req, res, next) => { 
+app.post('/upload', multer.any(), (req, res, next) => {
 
   if (!req.files || !req.body.userId) {
     res.status(400).send('No file uploaded.');
@@ -31,36 +38,33 @@ app.post('/upload', multer.any(), (req, res, next) => {
 
   const { userId } = req.body
   const [ idImage, userImage ] = req.files
+  const unverifiedImages = [idImage.buffer, userImage.buffer]
 
-  const  db = admin.database();
-  const  ref = db.ref("userInfo");
-
-  const usersRef = ref.child("userId");
-
-  // promise all
-  // textDetection & faceAPI
-  usersRef.update({
-    [userId]: {
-      idImage: Buffer.from(idImage.buffer).toString('base64'),
-      userImage: Buffer.from(userImage.buffer).toString('base64')
-    }
-  })
-  .then(data => console.log(data.getDownloadUrl()))
-
-  usersRef.on('value', snapshot => {
-    // kick off the verification process
-
-    // Create a reference to the file we want to download
-    const idImageUrl = storageRef.child('images/stars.jpg');
-
-    // Get the download URL
-    idImageUrl.getDownloadURL().then(function(url) {
-      // Insert url into an <img> tag to "download"
-      console.log("this is the url:", url)
-    })
-
-    
-  })
+  let faceIds = []
+  
+  Promise.all([
+      unverifiedImages.map(image => {
+      Promise.all([
+        faceDetect(image, faceIds)
+        .then(result => {
+          if (result) {
+            const p = Promise.resolve(faceVerify(result))
+            p.then(response => {
+              userInfo = {
+                userId,
+                'faceVerification': response
+              }
+              next()
+            })
+          }
+        })
+      ])
+    }),
+    textDetect(idImage)
+  ])
+  //.then(text => userInfo.idInfo[text])
+},() => {
+  console.log(userInfo)
 })
 
 module.exports = {
