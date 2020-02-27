@@ -1,53 +1,29 @@
-const vision = require('@google-cloud/vision');
-const client = new vision.ImageAnnotatorClient();
-const firebase = require('firebase')
+const axios = require('axios')
 
-const textDetect = proofOfId => {
-  const request = {
-    image: {
-      source: { imageUri: proofOfId } // POST body > { "proofOfId": "/path/img" }
+const ocr = (image) => {
+
+  const axiosOCR = axios.create({
+    method: 'post',
+    baseURL: 'https://westus.api.cognitive.microsoft.com/vision/v2.0/ocr?',
+    headers: {
+      'content-type': 'application/octet-stream',
+      'Ocp-Apim-Subscription-Key': 'cddc485fef374aba8a22764e581f9e95'
     }
-  }
-  
+  })
 
-  client
-    .textDetection(request)
+  return axiosOCR({ data: image })
     .then(response => {
-      console.log('running:', response)
-      return response
+      const words = response.data.regions[0].lines.map(line => {
+        return line.words.map(word=> {
+          return word.text
+        })
+      })
+      return [].concat.apply([], words) // condense multiple arrays to one array
     })
-    .catch(err => {
-      return err
-    })
+
 }
 
-/* exports.textDetection = (req, res) => { // extract text from gov-issued id
-  console.log('in here')
-    const request = {
-      image: {
-        source: { imageUri: req.body.proofOfId } // POST body > { "proofOfId": "/path/img" }
-      }
-    }
-  
-    client
-      .textDetection(request)
-      .then(response => {
-        const file = {
-          img: request.image.source.imageUri,
-          name: req.body.userId // hash from user info
-        }
-        const storageRef = firebase.storage().ref(`users-proofOfId/${file.name}`) // Create storage ref
-        const task = storageRef.put(file) // store in firebase
-        const url = task.snapshot.ref.getDownloadURL() // get id url for face API
-  
-        res.status(200).send(response, url) // return id text and url for azure faceAPI detection
-      })
-      .catch(err => {
-        console.error(err);
-      })
-    
-  } */
 
   module.exports = {
-    textDetect
+    ocr
   }

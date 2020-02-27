@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const { faceDetect, faceVerify } = require('./faceApi')
-const { textDetect } = require('./textDetect')
+const { ocr } = require('./textDetect')
 
 
 
@@ -24,12 +24,11 @@ const { multer } = require('./middleware')
 
 
 
-let userInfo; // object that holds important response data
-
+let userInfo = {} // object that holds important response data
 
 
 /* ------------request start-------------- */
-app.post('/upload', multer.any(), (req, res, next) => {
+app.post('/upload', multer.any(), async (req, res, next) => {
 
   if (!req.files || !req.body.userId) {
     res.status(400).send('No file uploaded.');
@@ -37,12 +36,14 @@ app.post('/upload', multer.any(), (req, res, next) => {
   }
 
   const { userId } = req.body
+  userInfo.userId = userId
+
   const [ idImage, userImage ] = req.files
   const unverifiedImages = [idImage.buffer, userImage.buffer]
 
   let faceIds = []
   
-  Promise.all([
+  const test = Promise.all([
       unverifiedImages.map(image => {
       Promise.all([
         faceDetect(image, faceIds)
@@ -50,21 +51,19 @@ app.post('/upload', multer.any(), (req, res, next) => {
           if (result) {
             const p = Promise.resolve(faceVerify(result))
             p.then(response => {
-              userInfo = {
-                userId,
-                'faceVerification': response
-              }
-              next()
+              userInfo.faceVerification = response
+              res.send(userInfo)
             })
           }
         })
       ])
     }),
-    textDetect(idImage)
+    userInfo.idText = await ocr(idImage.buffer)
   ])
-  //.then(text => userInfo.idInfo[text])
-},() => {
+  //test.then(() => res.send(userInfo))
+}, () => {
   console.log(userInfo)
+  return userInfo
 })
 
 module.exports = {
