@@ -1,8 +1,10 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const { faceDetect, faceVerify } = require('./faceApi')
 const { pdf417Decode } = require('./dlDetect')
 
+app.use(cors())
 
 /* ------------for request-------------- */
 const { multer } = require('./middleware')

@@ -1,11 +1,8 @@
 const { app } = require('./app')
-const cors = require('cors')
-
 
 /* -------------middleware-------------- */
 const bodyParser = require('body-parser')
 
-app.use(cors())
 app.use(bodyParser.json())
 
 
