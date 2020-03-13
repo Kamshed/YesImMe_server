@@ -4,16 +4,6 @@ const { faceDetect, faceVerify } = require('./faceApi')
 const { pdf417Decode } = require('./dlDetect')
 
 
-/* ------------for firebase Auth-------------- */
-const admin = require("firebase-admin");
-const serviceAccount = require("./testkamshed-firebase-adminsdk-qbo7n-87c14b367b.json");
-
-// Initialize the app with a service account, granting admin privileges
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://testkamshed.firebaseio.com"
-});
-
 /* ------------for request-------------- */
 const { multer } = require('./middleware')
 
