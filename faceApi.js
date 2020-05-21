@@ -1,10 +1,11 @@
 const axios = require('axios')
+const { ACS_FACE_KEY, ACS_FACE_URL } = require('./config')
 
 const faceDetect = (image, faceIds) => {
 
   const axiosFaceDetect = axios.create({
     method: 'post',
-    baseURL: 'https://westus.api.cognitive.microsoft.com/face/v1.0/detect?',
+    baseURL: `${ACS_FACE_URL}/detect?`,
     params: {
       returnFaceId: true,
       recognitionModel: 'recognition_02',
@@ -12,7 +13,7 @@ const faceDetect = (image, faceIds) => {
     },
     headers: {
       'content-type': 'application/octet-stream',
-      'Ocp-Apim-Subscription-Key': '952e99f636c047dab40bbc459f45e2a9'
+      'Ocp-Apim-Subscription-Key': ACS_FACE_KEY
     }
   })
 
@@ -33,10 +34,10 @@ const faceVerify = (faceIds) => {
 
   const axiosFaceVerify = axios.create({
     method: 'post',
-    baseURL: 'https://westus.api.cognitive.microsoft.com/face/v1.0/verify?',
+    baseURL: `${ACS_FACE_URL}/verify?`,
     headers: {
       'content-type': 'application/json',
-      'Ocp-Apim-Subscription-Key': '952e99f636c047dab40bbc459f45e2a9'
+      'Ocp-Apim-Subscription-Key': ACS_FACE_KEY
     }
   })
 

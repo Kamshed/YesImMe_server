@@ -1,8 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
+const bodyParser = require('body-parser')
 const { faceDetect, faceVerify } = require('./faceApi')
 const { pdf417Decode } = require('./dlDetect')
+const { send } = require('./sendMail')
+
 
 app.use(cors())
 
@@ -12,7 +15,7 @@ const { multer } = require('./middleware')
 
 let userInfo = {} // object that holds important response data
 
-app.post('/upload', multer.any(), async (req, res, next) => {
+app.post('/api/upload', multer.any(), async (req, res, next) => {
 
   if (!req.files || !req.body.userId) {
     res.status(400).send('No file uploaded.');
@@ -45,6 +48,17 @@ app.post('/upload', multer.any(), async (req, res, next) => {
     res.send(userInfo)
   ])
 })
+
+
+
+app.post("/api/send", bodyParser.urlencoded({ extended: true }), (req, res) => { // Contact Form
+  const result = Promise.resolve(send(req.body))
+  result.then(result => {
+    return res.send(result)
+  })
+})
+
+
 
 module.exports = {
   app

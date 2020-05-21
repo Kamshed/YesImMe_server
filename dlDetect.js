@@ -1,11 +1,12 @@
-let Dynamsoft = require('dynamsoft-node-barcode');
-Dynamsoft.BarcodeReader.productKeys = 't0068MgAAACdpEm7LWt4nFOtJAWGi5VkqZQ8iBn0j9tP6RTXKh3NqBb2m7Vkt3ATDjtLhHo+vJA+N4RllCKb2oxFSdxLvTwM=';
+const Dynamsoft = require('dynamsoft-node-barcode')
+const { DYNAMSOFT_KEY } = require('./config')
+Dynamsoft.BarcodeReader.productKeys = DYNAMSOFT_KEY
 
 
 const pdf417Decode = async buffer => {
     console.log("============== create reader ==============");
     let reader = await Dynamsoft.BarcodeReader.createInstance();
-    //const [ barcode ] = await req.files
+    
     console.log("============== decode buffer ==============");
   
     const barcodeInfo = await reader.decode(buffer)
