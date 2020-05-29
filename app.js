@@ -13,9 +13,9 @@ app.use(cors())
 const { multer } = require('./middleware')
 
 
-let userInfo = {} // object that holds important response data
-
 app.post('/api/upload', multer.any(), async (req, res, next) => {
+
+  let userInfo = {} // object that holds important response data
 
   if (!req.files || !req.body.userId) {
     res.status(400).send('No file uploaded.');
