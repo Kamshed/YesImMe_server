@@ -1,7 +1,7 @@
 const axios = require('axios')
 const { ACS_FACE_KEY, ACS_FACE_URL } = require('./config')
 
-const faceDetect = (image, faceIds) => {
+const faceDetect = (image, faceIds, i) => {
 
   const axiosFaceDetect = axios.create({
     method: 'post',
@@ -19,11 +19,18 @@ const faceDetect = (image, faceIds) => {
 
   return axiosFaceDetect({ data: image })
     .then(response => {
+      if (!response.data[0]) {
+        throw new Error(`Cannot detect face in image ${i}`)
+      }
+      
       const info = response.data[0].faceId
       faceIds.push(info)
     })
     .then(() => {
       if (faceIds.length === 2) return faceIds
+    })
+    .catch(err => { 
+      return err 
     })
 
 }
@@ -47,6 +54,7 @@ const faceVerify = (faceIds) => {
   .then(response => {
     return response.data
   })
+  .catch(err => { return err })
 }
 
   module.exports = { faceDetect, faceVerify }

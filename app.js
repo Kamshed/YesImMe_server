@@ -27,25 +27,56 @@ app.post('/api/upload', multer.any(), async (req, res, next) => {
 
   const [ idFront, idBack, userImage ] = req.files
   let faceIds = []
-  
+  const faceImages = [
+    "idFront",
+    "userImage"
+  ]
+  let errorStatus = []
   
   Promise.all([
     
-      [idFront.buffer, userImage.buffer].map(image => {
+      [idFront.buffer, userImage.buffer].map((image, i) => {
       Promise.all([
-        faceDetect(image, faceIds) // facial recognition
+        faceDetect(image, faceIds, i) // facial recognition
         .then(result => {
-          if (result) {
+          if (result.length > 0) {
+            console.log("result?:", result)
             const p = Promise.resolve(faceVerify(result))
             p.then(response => {
               userInfo.faceVerification = response
             })
           }
+          else { 
+            const image = faceImages[i]
+            status = "No face detected"
+            switch (errorStatus.length) {
+              case 0: errorStatus[0] = {[image]: status}
+                break;
+              case 1: errorStatus[1] = {[image]: status}
+                break
+            }
+            userInfo.errors = errorStatus
+          }
         })
       ])
     }),
     userInfo.idText = await pdf417Decode(idBack.buffer), // PDF417 info extraction
-    res.send(userInfo)
+    (() => {
+      if (!userInfo.idText) {
+        const status = "No barcode detected"
+        switch (errorStatus.length) {
+          case 0: errorStatus[0] = {"idBack": status}
+            break;
+          case 1: errorStatus[1] = {"idBack": status}
+            break
+          case 2: errorStatus[2] = {"idBack": status}
+            break
+        }
+        userInfo.errors = errorStatus
+        return res.send(userInfo)
+      }
+      return res.send(userInfo)
+    })()
   ])
 })
 

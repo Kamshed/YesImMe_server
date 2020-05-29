@@ -5,7 +5,7 @@ sgMail.setApiKey(SENDGRID_API)
 function msg(body) {
   return ({
     to: 'josh@kamshed.com',
-    from: 'josh@kamshed.com',
+    from: "josh@kamshed.com",
     subject: `Contact Form: ${body.company}-${body.name}`,
     html: `<p>${body.email}</p><p>${body.message}</p>`
   })
@@ -14,7 +14,7 @@ function msg(body) {
 function autoResponse(body) {
   return ({
     to: body.email,
-    from: 'josh@kamshed.com',
+    from: 'doNotRespond@kamshed.com',
     subject: "Thank you for contacting YesI'mMe",
     html: 
     `
